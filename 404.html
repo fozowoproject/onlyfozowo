@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Redirecting... | OFZ</title>
+  <script>
+    (function () {
+      const TARGET_BASE = "https://only.fozowo.com/profile?u=";
+      const FALLBACK_URL = "https://only.fozowo.com/";
+
+      const { pathname, search } = window.location;
+      const cleanPath = pathname.replace(/^\/+|\/+$/g, "");
+      const segments = cleanPath ? cleanPath.split("/") : [];
+
+      let userId = "";
+
+      // 1. /profile?○○○ または /profile?u=○○○
+      if (cleanPath === "profile" && search.length > 1) {
+        const rawQuery = search.slice(1);
+        if (rawQuery.includes("=")) {
+          const params = new URLSearchParams(search);
+          userId = params.get("u") || params.values().next().value || "";
+        } else {
+          userId = decodeURIComponent(rawQuery.split("&")[0]);
+        }
+      }
+      // 2. /@○○○
+      else if (segments.length === 1 && segments[0].startsWith("@")) {
+        userId = segments[0].slice(1);
+      }
+      // 3. /○○○
+      else if (segments.length === 1 && segments[0]) {
+        userId = segments[0];
+      }
+
+      const destination = userId
+        ? TARGET_BASE + encodeURIComponent(userId)
+        : FALLBACK_URL;
+
+      window.location.replace(destination);
+    })();
+  </script>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      background-color: #0f0f0f;
+      color: #ffffff;
+      text-align: center;
+    }
+    a {
+      color: #4da6ff;
+      text-decoration: none;
+    }
+    a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div>
+    <p>プロフィールページへ移動しています...</p>
+    <p><small>自動で切り替わらない場合は、<a href="https://only.fozowo.com/">こちら</a>をクリックしてください。</small></p>
+  </div>
+</body>
+</html>
